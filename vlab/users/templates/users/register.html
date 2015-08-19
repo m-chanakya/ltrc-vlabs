@@ -1,0 +1,43 @@
+{% block title %}User Registration<br/><br/>{% endblock %}
+{% block content %}
+<a id="fbloginbtn" href="{% url 'social:begin' 'facebook' %}?next={{ request.path }}">
+        <div class="btn" id="fbloginbtn">Login with Facebook</div>
+</a>
+<form method="post" action=".">
+{% csrf_token %}
+<table>
+<tr>
+	<td>{{ form.username.label_tag }}</td>
+    <td>{{ form.username }}</td>
+</tr>
+
+<tr>
+	<td>{{ form.institute.label_tag }}</td>
+    <td>{{ form.institute }}</td>
+</tr>
+
+<tr>
+	<td>{{ form.course.label_tag }}</td>
+    <td>{{ form.course }}</td>
+</tr>
+
+<tr>
+	<td>{{ form.email.label_tag }}</td>
+    <td>{{ form.email }}</td>
+</tr>
+
+<tr>
+	<td>{{ form.password1.label_tag }}</td>
+    <td>{{ form.password1 }}</td>	
+</tr>
+
+<tr>
+	<td>{{ form.password2.label_tag }}</td>
+    <td>{{ form.password2 }}</td>
+</tr>
+</table>
+</br>
+	<input type="submit" value="register" />
+</form>
+{% endblock %}
+

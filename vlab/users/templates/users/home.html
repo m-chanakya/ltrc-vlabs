@@ -1,0 +1,7 @@
+{% if user.is_authenticated %}
+	<a href="{% url 'auth:logout' %}?next={{ request.path }}">Logout</a>
+	<br/><br/>
+    <p>Welcome, {{ user.username }} {{user.institute}} {{user.course}}. Thanks for logging in.</p>
+{% else %}
+    <p>Welcome, new user. Please <a href='/register'>Register</a></p>
+{% endif %}
