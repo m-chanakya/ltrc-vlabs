@@ -1,8 +1,6 @@
 # ltrc-vlabs
 Virtual Lab for NLP experiments
 
-## How do I get set up? ##
-
 **Install the requirements:**
 
 1. virtualenv --no-site-packages --distribute venv
