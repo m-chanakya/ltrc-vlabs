@@ -162,3 +162,6 @@ LOGIN_EXEMPT_URLS = (
   r'^login/',
   r'^complete/',
 )
+
+#ADDED EXPERMIENTS
+INSTALLED_APPS += ('morphology',)

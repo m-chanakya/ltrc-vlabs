@@ -11,8 +11,10 @@ class Experiment(BaseModel):
 	prescribed_time = models.IntegerField(default=0)
 	max_score = models.IntegerField(default=0)
 
+	REQUIRED_FIELDS = ['name', 'lang']
+
 	def __unicode__(self):
-		return '%s, %s, %s' %(self.lab_category, self.lang, self.name)
+		return '%s, %s' %(self.lang, self.name)
 
 
 class ExperimentStage(BaseModel):
@@ -22,6 +24,11 @@ class ExperimentStage(BaseModel):
 	completed_count = models.IntegerField(default=0)
 	prescribed_time = models.IntegerField(default=0)
 	max_score = models.IntegerField()
+	
+	REQUIRED_FIELDS = ['name', 'prescribed_time', 'max_score']
+
+	class Meta:
+		unique_together = ('experiment', 'name',)
 
 	def __unicode__(self):
 		return '%s, %s' %(self.experiment.name, self.name)
@@ -31,7 +38,8 @@ class ExperimentStage(BaseModel):
 			experiment = self.experiment
 			experiment.prescribed_time += self.prescribed_time
 			experiment.max_score += self.max_score
-		return super(Profile, self).save(*args, **kwargs)
+			experiment.save()
+		return super(ExperimentStage, self).save(*args, **kwargs)
 
 
 class Participant(BaseModel):
