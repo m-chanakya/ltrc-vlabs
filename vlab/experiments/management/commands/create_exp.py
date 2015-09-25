@@ -51,14 +51,14 @@ class Command(BaseCommand):
 				self.stderr.write("Directory not copied. Error: %s" % str(e))
 			try:
 				template_dir = app_name + '/templates/' + app_name
-				os.mkdir(template_dir)
+				os.makedirs(template_dir)
 				with open("vlab/settings.py", "a") as myFile:
-					myFile.write("INSTALLED_APPS += ('%s',)" % app_name)
+					myFile.write("INSTALLED_APPS += ('%s',)\n" % app_name)
 					myFile.close()
 				experiment = Experiment(**user_data)
 				experiment.save()
 			except Exception as e:
-				self.stderr.write("Directory not copied. Error: %s" % str(e))
+				self.stderr.write("Directory not copied. Error 1: %s" % str(e))
 				shutil.rmtree(app_name)	
 			#management.call_command('makemigrations', app_name)
 			#management.call_command('migrate')

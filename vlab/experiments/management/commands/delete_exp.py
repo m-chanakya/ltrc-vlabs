@@ -1,5 +1,5 @@
 from django.core.management.base import BaseCommand, CommandError
-from experiments.models import Experiment, ExperimentStage
+from experiments.models import Experiment
 from django.core import exceptions
 from django.conf import settings
 from django.core import management
@@ -11,7 +11,7 @@ class NotRunningInTTYException(Exception):
     pass
 
 class Command(BaseCommand):
-	help = 'Adds a new Experment Stage'
+	help = 'Remove an existing Experiment'
 
 	def execute(self, *args, **options):
 		self.stdin = options.get('stdin', sys.stdin)  # Used for testing
@@ -33,42 +33,34 @@ class Command(BaseCommand):
 					self.stderr.write("Invalid experiment name")
 					user_data['experiment'] = None
 
-			for field_name in ExperimentStage.REQUIRED_FIELDS:
-				field = Experiment._meta.get_field(field_name)
-				user_data[field_name] = None
-				while user_data[field_name] is None:
-					message = field_name.upper() + ': '
-					user_data[field_name] = self.get_input_data(field, message)
-
 		except KeyboardInterrupt:
 			self.stderr.write("\nOperation cancelled.")
 			sys.exit(1)
 
 		except NotRunningInTTYException:
 			self.stdout.write(
-			"Experiment Stage creation skipped due to not running in a TTY. "
-			"You can run `manage.py create_exp_stage` in your project "
+			"Experiment removal skipped due to not running in a TTY. "
+			"You can run `manage.py delete_exp` in your project "
 			"to create one manually."
 			)
 
-		experiment = user_data['experiment']
-		stage_name = user_data['name']
-		template = experiment.name + '/templates/' + experiment.name + '/' + stage_name + '.html'
+		app_name = user_data['experiment'].name
+		user_data['experiment'].delete()
 		try:
-			open(template, 'a').close()
-			experiment_stage = ExperimentStage(**user_data)
-			experiment_stage.save()
+			shutil.rmtree(app_name)
 		except Exception as e:
-			self.stderr.write("Error: %s" % str(e))
-			os.remove(template)
-
-	def get_input_data(self, field, message, default=None):
-		raw_value = raw_input(message)
-		if default and raw_value == '':
-			raw_value = default
-		try:
-			val = field.clean(raw_value, None)
-		except exceptions.ValidationError as e:
-			self.stderr.write("Error: %s" % '; '.join(e.messages))
-			val = None	
-		return val
+			self.stderr.write("Directory not deleted. Error: %s" % str(e))
+			pass
+		if app_name in settings.INSTALLED_APPS:
+			try:
+				app_line = "INSTALLED_APPS += ('%s',)\n" % app_name
+				f = open("vlab/settings.py", "r+")
+				data = f.readlines()
+				f.seek(0)
+				for line in data:
+					if line != app_line:
+						f.write(line)
+				f.truncate()
+				f.close()
+			except Exception as e:
+				self.stderr.write("Settings couldn't be updated. Error 1: %s" % str(e))
